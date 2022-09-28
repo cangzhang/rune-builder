@@ -1,0 +1,9 @@
+{
+  "name": "@champ-r/{{ .PkgName }}",
+  "version": "{{ .OfficialVersion }}-v{{ .Timestamp }}",
+  "sourceVersion": "{{ .SourceVersion }}",
+  "description": "LoL champion statistics from {{ .PkgName }}.",
+  "main": "index.json",
+  "author": "Al Cheung",
+  "license": "MIT"
+}

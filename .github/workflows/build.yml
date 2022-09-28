@@ -1,0 +1,48 @@
+name: Build Test
+
+on:
+  push:
+    branches:
+      - main
+      - build/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+          check-latest: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Build & run
+        run: |
+          go build -ldflags "-X main.Version=$GITHUB_SHA"
+          ./data-maker -v 
+          ./data-maker -sr
+          echo "sleep..." && sleep 3m
+          ./data-maker -aram
+          echo "sleep..." && sleep 3m
+          ./data-maker -urf
+
+      - name: NPM test
+        env:
+          token: ${{ secrets.NPM_TOKEN }}
+        run: |
+          sh ./scripts/update_pkg_name.sh
+          sh ./scripts/publish_test_package.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: |
+            output/*
