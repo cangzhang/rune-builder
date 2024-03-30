@@ -12,5 +12,5 @@ jobs:
     steps:
       - name: Run
         run: |
-          docker run -d  --name=flaresolverr  -p 8191:8191  -e LOG_LEVEL=info  --restart unless-stopped  ghcr.io/flaresolverr/flaresolverr:latest
-          curl -L -X POST 'http://localhost:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://google.com", "maxTimeout": 60000 }'
+          docker run -d --name=flaresolverr -p 8191:8191 -e LOG_LEVEL=info --restart unless-stopped ghcr.io/flaresolverr/flaresolverr:latest
+          curl -L -X POST 'http://0.0.0.0:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
