@@ -10,16 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@main
+      - uses: addnab/docker-run-action@v3
+        with:
+          registry: gcr.io
+          image: flaresolverr/flaresolverr:latest
+          options: -p 8191:8191 -e LOG_LEVEL=info
 
-      - name: Start containers
-        run: docker-compose -f "docker-compose.yml" up -d
-
-      - name: Run
+      # Wait for the service to be ready
+      - name: Wait for FlareSolverr to be ready
         run: |
-          curl -vvv -L -X POST 'http://0.0.0.0:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
+          until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:8191); do
+              printf '.'
+              sleep 5
+          done
 
-      - name: Stop containers
-        if: always()
-        run: docker-compose -f "docker-compose.yml" down
+      # Now that the service is ready, run your curl command
+      - name: Test FlareSolverr
+        run: |
+          curl -vvv -L -X POST 'http://127.0.0.1:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
