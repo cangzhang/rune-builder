@@ -10,7 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d
+
       - name: Run
         run: |
-          docker run -d -p 8191:8191 -e LOG_LEVEL=info --restart unless-stopped ghcr.io/flaresolverr/flaresolverr:latest
           curl -vvv -L -X POST 'http://0.0.0.0:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
