@@ -14,19 +14,16 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: Run flaresolverr container
-      run: |
-        docker run -d \
-          --name=flaresolverr \
-          -p 8191:8191 \
-          -e LOG_LEVEL=info \
-          --restart unless-stopped \
-          ghcr.io/flaresolverr/flaresolverr:latest
-        curl -L -X POST 'http://localhost:8191/v1' \
-          -H 'Content-Type: application/json' \
-          --data-raw '{
-            "cmd": "request.get",
-            "url": "http://www.op.gg/modes/aram",
-            "maxTimeout": 60000
-          }'
-    
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      with:
+          image: ghcr.io/flaresolverr/flaresolverr:latest
+          options: --name=flaresolverr -p 8191:8191 -e LOG_LEVEL=info --restart unless-stopped
+          run: |
+            curl -L -X POST 'http://localhost:8191/v1' \
+              -H 'Content-Type: application/json' \
+              --data-raw '{
+                "cmd": "request.get",
+                "url": "http://www.op.gg/modes/aram",
+                "maxTimeout": 60000
+              }'
