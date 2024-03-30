@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - build/*
 
 jobs:
   run-docker:
@@ -18,4 +17,4 @@ jobs:
     steps:
       - name: Run
         run: |
-          curl -L -X POST 'http://localhost:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "http://www.op.gg/modes/aram", "maxTimeout": 60000 }'
+          curl -L -X POST 'http://localhost:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
