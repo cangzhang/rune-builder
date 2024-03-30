@@ -10,21 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: addnab/docker-run-action@v3
-        with:
-          registry: gcr.io
-          image: flaresolverr/flaresolverr:latest
-          options: -p 8191:8191 -e LOG_LEVEL=info
+      - name: Start Docker Container
+        run: |
+          docker network create custom_network
+          docker run -d \
+            --network=custom_network \
+            --name=flaresolverr \
+            -p 8191:8191 \
+            -e LOG_LEVEL=info \
+            flaresolverr/flaresolverr:latest
 
-      # Wait for the service to be ready
       - name: Wait for FlareSolverr to be ready
         run: |
           until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:8191); do
               printf '.'
-              sleep 5
+              sleep 1
           done
 
-      # Now that the service is ready, run your curl command
-      - name: Test FlareSolverr
+      - name: Execute Curl Command
         run: |
           curl -vvv -L -X POST 'http://127.0.0.1:8191/v1' -H 'Content-Type: application/json' --data-raw '{ "cmd": "request.get", "url": "https://www.op.gg/modes/aram", "maxTimeout": 60000 }'
